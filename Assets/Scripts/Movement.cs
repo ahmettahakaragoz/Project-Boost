@@ -26,11 +26,15 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             rb.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
-            audioSource.Play();
+            
+            if(!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
         }
         else
         {
-            audioSource.Pause();
+            audioSource.Stop();
         }
     }
 
