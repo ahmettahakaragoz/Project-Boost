@@ -6,45 +6,58 @@ using UnityEngine.SceneManagement;
 
 public class CollisionHandler : MonoBehaviour
 {
-    [SerializeField] float delay = 1f;
+    [SerializeField] float delay = 2f;
     [SerializeField] AudioClip succes;
     [SerializeField] AudioClip crash;
+
+    [SerializeField] ParticleSystem succesParticles;
+    [SerializeField] ParticleSystem crashParticles;
+
+    bool isTransitioning = false;
 
     AudioSource audioSource;
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();   
+        audioSource = GetComponent<AudioSource>();
     }
     void OnCollisionEnter(Collision other)
     {
-       switch(other.gameObject.tag)
-        {
-            case "Friendly":
-                Debug.Log("Safe Area");
-                break;
+        if (isTransitioning) { return; }
 
-            case "Finish":
-                StartNextSequence();
-                break;
+           switch(other.gameObject.tag)
+            {
+                case "Friendly":
+                    Debug.Log("Safe Area");
+                    break;
 
-            default:
-                StartCrashSequence();
-                break;
-        }
+                case "Finish":
+                    StartNextSequence();
+                    break;
+
+                default:
+                    StartCrashSequence();
+                    break;
+            }
     }
 
     void StartCrashSequence()
     {
-        GetComponent<Movement>().enabled = false;
+        isTransitioning = true; 
+        audioSource.Stop();
+        crashParticles.Play();
         audioSource.PlayOneShot(crash);
+        GetComponent<Movement>().enabled = false;
         Invoke("ReloadLevel", delay);//ReloadLevel Metodu çalýþmadan önce delay kadar bekletiyoruz
     }
 
     void StartNextSequence()
     {
-        GetComponent<Movement>().enabled = false;//Movement Componentini devredýþý býrakýyoruz
+        isTransitioning = true;
+        audioSource.Stop();
+        succesParticles.Play();
         audioSource.PlayOneShot(succes);
+        GetComponent<Movement>().enabled = false;//Movement Componentini devredýþý býrakýyoruz
         Invoke("NextLevel", delay);
     }
 
