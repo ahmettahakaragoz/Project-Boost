@@ -14,6 +14,7 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem crashParticles;
 
     bool isTransitioning = false;
+    bool collisionDisabled = false;
 
     AudioSource audioSource;
 
@@ -21,14 +22,32 @@ public class CollisionHandler : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
+
+    void Update()
+    {
+        RespondToDebugKeys();
+    }
+
+    void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            NextLevel();
+        }
+        else if (Input.GetKey(KeyCode.C))
+        {
+            collisionDisabled = !collisionDisabled; //toggle collision
+        }
+    }
+
     void OnCollisionEnter(Collision other)
     {
-        if (isTransitioning) { return; }
+        if (isTransitioning || collisionDisabled) { return; } //return ederek bir sonraki satýra geçilmesini engelliyoruz.
 
            switch(other.gameObject.tag)
             {
                 case "Friendly":
-                    Debug.Log("Safe Area");
+                Debug.Log("Sen Yaparsýn");
                     break;
 
                 case "Finish":
